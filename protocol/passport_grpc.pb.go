@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,15 +20,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PassportService_Health_FullMethodName         = "/protocol.PassportService/Health"
-	PassportService_CreateUser_FullMethodName     = "/protocol.PassportService/CreateUser"
-	PassportService_DeleteUser_FullMethodName     = "/protocol.PassportService/DeleteUser"
-	PassportService_UpdateUser_FullMethodName     = "/protocol.PassportService/UpdateUser"
-	PassportService_SearchUser_FullMethodName     = "/protocol.PassportService/SearchUser"
-	PassportService_GetUserById_FullMethodName    = "/protocol.PassportService/GetUserById"
-	PassportService_GetUserByToken_FullMethodName = "/protocol.PassportService/GetUserByToken"
-	PassportService_SignIn_FullMethodName         = "/protocol.PassportService/SignIn"
-	PassportService_SignOut_FullMethodName        = "/protocol.PassportService/SignOut"
+	PassportService_Health_FullMethodName = "/protocol.PassportService/Health"
+	PassportService_Shell_FullMethodName  = "/protocol.PassportService/Shell"
 )
 
 // PassportServiceClient is the client API for PassportService service.
@@ -37,23 +31,9 @@ const (
 // PassportService 认证服务
 type PassportServiceClient interface {
 	// Health 服务健康检查
-	Health(ctx context.Context, in *HealthParam, opts ...grpc.CallOption) (*HealthParamReply, error)
-	// CreateUser 创建用户
-	CreateUser(ctx context.Context, in *CreateUserParam, opts ...grpc.CallOption) (*CreateUserReply, error)
-	// DeleteUser 删除用户
-	DeleteUser(ctx context.Context, in *DeleteUserParam, opts ...grpc.CallOption) (*DeleteUserReply, error)
-	// UpdateUser 更新用户
-	UpdateUser(ctx context.Context, in *UpdateUserParam, opts ...grpc.CallOption) (*UpdateUserReply, error)
-	// SearchUser 搜索用户
-	SearchUser(ctx context.Context, in *SearchUserParam, opts ...grpc.CallOption) (*SearchUserReply, error)
-	// GetUserById 获取用户
-	GetUserById(ctx context.Context, in *GetUserByIdParam, opts ...grpc.CallOption) (*GetUserByIdReply, error)
-	// GetUserByToken 基于token查询用户(已失效 => ERROR_TOKEN)
-	GetUserByToken(ctx context.Context, in *GetUserByTokenParam, opts ...grpc.CallOption) (*GetUserByTokenReply, error)
-	// SignIn 登陆
-	SignIn(ctx context.Context, in *SignInParam, opts ...grpc.CallOption) (*SignInReply, error)
-	// SignOut 登出
-	SignOut(ctx context.Context, in *SignOutParam, opts ...grpc.CallOption) (*SignOutReply, error)
+	Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Shell 交互命令, 第一次需要使用token建立握手
+	Shell(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error)
 }
 
 type passportServiceClient struct {
@@ -64,9 +44,9 @@ func NewPassportServiceClient(cc grpc.ClientConnInterface) PassportServiceClient
 	return &passportServiceClient{cc}
 }
 
-func (c *passportServiceClient) Health(ctx context.Context, in *HealthParam, opts ...grpc.CallOption) (*HealthParamReply, error) {
+func (c *passportServiceClient) Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(HealthParamReply)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, PassportService_Health_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -74,85 +54,18 @@ func (c *passportServiceClient) Health(ctx context.Context, in *HealthParam, opt
 	return out, nil
 }
 
-func (c *passportServiceClient) CreateUser(ctx context.Context, in *CreateUserParam, opts ...grpc.CallOption) (*CreateUserReply, error) {
+func (c *passportServiceClient) Shell(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateUserReply)
-	err := c.cc.Invoke(ctx, PassportService_CreateUser_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &PassportService_ServiceDesc.Streams[0], PassportService_Shell_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[Message, Message]{ClientStream: stream}
+	return x, nil
 }
 
-func (c *passportServiceClient) DeleteUser(ctx context.Context, in *DeleteUserParam, opts ...grpc.CallOption) (*DeleteUserReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteUserReply)
-	err := c.cc.Invoke(ctx, PassportService_DeleteUser_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *passportServiceClient) UpdateUser(ctx context.Context, in *UpdateUserParam, opts ...grpc.CallOption) (*UpdateUserReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateUserReply)
-	err := c.cc.Invoke(ctx, PassportService_UpdateUser_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *passportServiceClient) SearchUser(ctx context.Context, in *SearchUserParam, opts ...grpc.CallOption) (*SearchUserReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SearchUserReply)
-	err := c.cc.Invoke(ctx, PassportService_SearchUser_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *passportServiceClient) GetUserById(ctx context.Context, in *GetUserByIdParam, opts ...grpc.CallOption) (*GetUserByIdReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUserByIdReply)
-	err := c.cc.Invoke(ctx, PassportService_GetUserById_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *passportServiceClient) GetUserByToken(ctx context.Context, in *GetUserByTokenParam, opts ...grpc.CallOption) (*GetUserByTokenReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUserByTokenReply)
-	err := c.cc.Invoke(ctx, PassportService_GetUserByToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *passportServiceClient) SignIn(ctx context.Context, in *SignInParam, opts ...grpc.CallOption) (*SignInReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SignInReply)
-	err := c.cc.Invoke(ctx, PassportService_SignIn_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *passportServiceClient) SignOut(ctx context.Context, in *SignOutParam, opts ...grpc.CallOption) (*SignOutReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SignOutReply)
-	err := c.cc.Invoke(ctx, PassportService_SignOut_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PassportService_ShellClient = grpc.BidiStreamingClient[Message, Message]
 
 // PassportServiceServer is the server API for PassportService service.
 // All implementations must embed UnimplementedPassportServiceServer
@@ -161,23 +74,9 @@ func (c *passportServiceClient) SignOut(ctx context.Context, in *SignOutParam, o
 // PassportService 认证服务
 type PassportServiceServer interface {
 	// Health 服务健康检查
-	Health(context.Context, *HealthParam) (*HealthParamReply, error)
-	// CreateUser 创建用户
-	CreateUser(context.Context, *CreateUserParam) (*CreateUserReply, error)
-	// DeleteUser 删除用户
-	DeleteUser(context.Context, *DeleteUserParam) (*DeleteUserReply, error)
-	// UpdateUser 更新用户
-	UpdateUser(context.Context, *UpdateUserParam) (*UpdateUserReply, error)
-	// SearchUser 搜索用户
-	SearchUser(context.Context, *SearchUserParam) (*SearchUserReply, error)
-	// GetUserById 获取用户
-	GetUserById(context.Context, *GetUserByIdParam) (*GetUserByIdReply, error)
-	// GetUserByToken 基于token查询用户(已失效 => ERROR_TOKEN)
-	GetUserByToken(context.Context, *GetUserByTokenParam) (*GetUserByTokenReply, error)
-	// SignIn 登陆
-	SignIn(context.Context, *SignInParam) (*SignInReply, error)
-	// SignOut 登出
-	SignOut(context.Context, *SignOutParam) (*SignOutReply, error)
+	Health(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	// Shell 交互命令, 第一次需要使用token建立握手
+	Shell(grpc.BidiStreamingServer[Message, Message]) error
 	mustEmbedUnimplementedPassportServiceServer()
 }
 
@@ -188,32 +87,11 @@ type PassportServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPassportServiceServer struct{}
 
-func (UnimplementedPassportServiceServer) Health(context.Context, *HealthParam) (*HealthParamReply, error) {
+func (UnimplementedPassportServiceServer) Health(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
 }
-func (UnimplementedPassportServiceServer) CreateUser(context.Context, *CreateUserParam) (*CreateUserReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
-}
-func (UnimplementedPassportServiceServer) DeleteUser(context.Context, *DeleteUserParam) (*DeleteUserReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
-}
-func (UnimplementedPassportServiceServer) UpdateUser(context.Context, *UpdateUserParam) (*UpdateUserReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
-}
-func (UnimplementedPassportServiceServer) SearchUser(context.Context, *SearchUserParam) (*SearchUserReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchUser not implemented")
-}
-func (UnimplementedPassportServiceServer) GetUserById(context.Context, *GetUserByIdParam) (*GetUserByIdReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
-}
-func (UnimplementedPassportServiceServer) GetUserByToken(context.Context, *GetUserByTokenParam) (*GetUserByTokenReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserByToken not implemented")
-}
-func (UnimplementedPassportServiceServer) SignIn(context.Context, *SignInParam) (*SignInReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
-}
-func (UnimplementedPassportServiceServer) SignOut(context.Context, *SignOutParam) (*SignOutReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignOut not implemented")
+func (UnimplementedPassportServiceServer) Shell(grpc.BidiStreamingServer[Message, Message]) error {
+	return status.Errorf(codes.Unimplemented, "method Shell not implemented")
 }
 func (UnimplementedPassportServiceServer) mustEmbedUnimplementedPassportServiceServer() {}
 func (UnimplementedPassportServiceServer) testEmbeddedByValue()                         {}
@@ -237,7 +115,7 @@ func RegisterPassportServiceServer(s grpc.ServiceRegistrar, srv PassportServiceS
 }
 
 func _PassportService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HealthParam)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -249,154 +127,17 @@ func _PassportService_Health_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: PassportService_Health_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).Health(ctx, req.(*HealthParam))
+		return srv.(PassportServiceServer).Health(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PassportService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).CreateUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_CreateUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).CreateUser(ctx, req.(*CreateUserParam))
-	}
-	return interceptor(ctx, in, info, handler)
+func _PassportService_Shell_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(PassportServiceServer).Shell(&grpc.GenericServerStream[Message, Message]{ServerStream: stream})
 }
 
-func _PassportService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteUserParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).DeleteUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_DeleteUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).DeleteUser(ctx, req.(*DeleteUserParam))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PassportService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).UpdateUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_UpdateUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).UpdateUser(ctx, req.(*UpdateUserParam))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PassportService_SearchUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchUserParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).SearchUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_SearchUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).SearchUser(ctx, req.(*SearchUserParam))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PassportService_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserByIdParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).GetUserById(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_GetUserById_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).GetUserById(ctx, req.(*GetUserByIdParam))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PassportService_GetUserByToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserByTokenParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).GetUserByToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_GetUserByToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).GetUserByToken(ctx, req.(*GetUserByTokenParam))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PassportService_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignInParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).SignIn(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_SignIn_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).SignIn(ctx, req.(*SignInParam))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PassportService_SignOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignOutParam)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassportServiceServer).SignOut(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassportService_SignOut_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassportServiceServer).SignOut(ctx, req.(*SignOutParam))
-	}
-	return interceptor(ctx, in, info, handler)
-}
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PassportService_ShellServer = grpc.BidiStreamingServer[Message, Message]
 
 // PassportService_ServiceDesc is the grpc.ServiceDesc for PassportService service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -409,39 +150,14 @@ var PassportService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Health",
 			Handler:    _PassportService_Health_Handler,
 		},
+	},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "CreateUser",
-			Handler:    _PassportService_CreateUser_Handler,
-		},
-		{
-			MethodName: "DeleteUser",
-			Handler:    _PassportService_DeleteUser_Handler,
-		},
-		{
-			MethodName: "UpdateUser",
-			Handler:    _PassportService_UpdateUser_Handler,
-		},
-		{
-			MethodName: "SearchUser",
-			Handler:    _PassportService_SearchUser_Handler,
-		},
-		{
-			MethodName: "GetUserById",
-			Handler:    _PassportService_GetUserById_Handler,
-		},
-		{
-			MethodName: "GetUserByToken",
-			Handler:    _PassportService_GetUserByToken_Handler,
-		},
-		{
-			MethodName: "SignIn",
-			Handler:    _PassportService_SignIn_Handler,
-		},
-		{
-			MethodName: "SignOut",
-			Handler:    _PassportService_SignOut_Handler,
+			StreamName:    "Shell",
+			Handler:       _PassportService_Shell_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "protocol/passport.proto",
 }

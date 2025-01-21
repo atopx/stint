@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"passport/internal/handler"
@@ -21,6 +22,7 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Panicf("load config error: %s", err)
 	}
+
 	// 日志初始化
 	var loglevel zapcore.Level
 	switch viper.GetString("server.env") {
@@ -40,7 +42,7 @@ func main() {
 	// 初始化基础组件 TODO: mysql, redis, kafka, rabbitmq等基础设施
 	db, err := handler.NewMySQLConnect()
 	if err != nil {
-		logger.Fatal(nil, "connect mysql error", zap.Error(err))
+		logger.Fatal(context.TODO(), "connect mysql error", zap.Error(err))
 	}
 
 	// 初始化服务
